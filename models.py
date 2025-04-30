@@ -1,0 +1,16 @@
+from datetime import datetime
+from sqlmodel import TIMESTAMP, Field, func
+
+from schemas import TaskBase
+
+
+class Task(TaskBase, table=True):
+    """Модель базы данных"""
+    id: int | None = Field(default=None, primary_key=True)
+    is_completed: bool | None = Field(default=False)
+    created_at: datetime = Field(
+        default_factory=datetime.now,  # Автоматически при создании объекта
+        sa_column_kwargs={"server_default": func.now()},  # Автоматически в БД
+        nullable=False,  # Обязательное поле
+    )
+    #user_id: int = Field(foreign_key="users.id", ondelete="CASCADE")

@@ -2,8 +2,8 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Query
 from sqlmodel import select
 from database import SessionDep
-from models import Task
-from schemas import TaskCreate, TaskPublic, TaskUpdate
+from models.tasks import Task
+from schemas.tasks import TaskCreate, TaskPublic, TaskUpdate
 
 
 router = APIRouter(prefix="/task", tags=["tasks"])
@@ -18,8 +18,8 @@ def create_task(task: TaskCreate, session: SessionDep):
     return db_task
 
 @router.get("/", response_model=list[TaskPublic])
-def read_tasks(session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100,) -> list[Task]:
-    """Чтение данных о задаче"""
+def read_tasks(session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100) -> list[Task]:
+    """Чтение данных о задачах"""
     tasks = session.exec(select(Task).offset(offset).limit(limit)).all()
     return tasks
 

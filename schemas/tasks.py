@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlmodel import TIMESTAMP, Field, SQLModel, func
+from sqlmodel import Field, SQLModel
 
 
 class TaskBase(SQLModel):
@@ -8,14 +8,14 @@ class TaskBase(SQLModel):
     description: str | None = Field(default=None)
 
 class TaskPublic(TaskBase):
-    """Модель задачи для пользователей"""
+    """Модель задачи для ответа"""
     id: int
-    is_completed: bool | None = Field(default=False)
+    is_completed: bool
     created_at: datetime  
 
 class TaskCreate(TaskBase):
     """Модель для создания данных задачи"""
-    #user_id: int = Field(..., foreign_key="users.id", ondelete="CASCADE")
+    user_id: int = Field(..., foreign_key="Users.id", ondelete="CASCADE")
 
 class TaskUpdate(TaskBase):
     """Модель для обновления данных задачи"""

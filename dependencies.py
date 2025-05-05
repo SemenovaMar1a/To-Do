@@ -5,7 +5,7 @@ import jwt
 from jwt import InvalidTokenError
 from core.config import ALGORITHM, SECRET_KEY
 from database import SessionDep
-from models.token import TokenData
+from schemas.token import TokenData
 from services.user import get_user
 
 

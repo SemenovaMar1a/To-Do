@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from core.config import ACCESS_TOKEN_EXPIRE_MINUTES
 from core.security import create_access_token
-from models.token import Token
+from schemas.token import Token
 from database import SessionDep
 from services.user import authenticate_user
 

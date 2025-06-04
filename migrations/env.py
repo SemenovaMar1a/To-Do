@@ -28,6 +28,7 @@ def run_migrations_offline():
         context.run_migrations()
 
 def run_migrations_online():
+    
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
@@ -48,6 +49,9 @@ def run_migrations_online():
         )
         with context.begin_transaction():
             context.run_migrations()
+    import os
+    print("Current working directory:", os.getcwd())
+    print("Database URL:", config.get_main_option("sqlalchemy.url"))
 
 if context.is_offline_mode():
     run_migrations_offline()

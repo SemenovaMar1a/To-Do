@@ -1,3 +1,4 @@
+from asyncio import Task
 from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -5,7 +6,9 @@ import jwt
 from jwt import InvalidTokenError
 from core.config import ALGORITHM, SECRET_KEY
 from database import SessionDep
+from models.users import User
 from schemas.token import TokenData
+from schemas.users import Role
 from services.user import get_user
 
 
@@ -30,3 +33,17 @@ async def get_current_user(session: SessionDep, token: Annotated[str, Depends(oa
     if user is None:
         raise credentials_exception
     return user
+
+
+async def check_admin(user: User = Depends(get_current_user)):
+    """Проверяет, является ли пользователь админом"""
+    if user.role != Role.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Требуются права администратора"
+        )
+    return user
+
+async def get_user_filter(user: User = Depends(get_current_user)):
+    """Возвращает фильтр для запросов: user_id для USER, None для ADMIN"""
+    return Task.user_id == user.id if user.role == Role.USER else None

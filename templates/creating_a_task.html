@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><title>Создание новой задачи</title></head>
+<body>
+    <h2>Register</h2>
+    <form action="/task/create_form" method="post">
+        <label>Название: <input type="text" name="title" /></label><br />
+        <label>Описание: <input type="text" name="description" /></label><br />
+        <label>Пользователь: {{ user.username }}</label><br />
+        <button type="submit">Добавить</button>
+    </form>
+</body>
+</html>

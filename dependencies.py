@@ -7,12 +7,13 @@ from jwt import InvalidTokenError
 from core.config import ALGORITHM, SECRET_KEY
 from database import SessionDep
 from models.users import User
+from routers.auth import OAuth2PasswordBearerWithCookie
 from schemas.token import TokenData
 from schemas.users import Role
 from services.user import get_user
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="token")
 
 async def get_current_user(session: SessionDep, token: Annotated[str, Depends(oauth2_scheme)]):
     """Получение авторизованного пользователя"""

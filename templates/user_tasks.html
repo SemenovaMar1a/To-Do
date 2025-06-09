@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head><title>My Tasks</title></head>
+<body>
+    <h2>{{ user.username }}'s Tasks</h2>
+    <ul>
+        {% for task in tasks %}
+            <h4>{{ task.title }}</h4>
+            <p>Описание: {{ task.description }}</p>
+            {% if task.is_completed == true %}
+                <p>Завершено: Да</p>
+            {% else %}
+                <p>Завершено: Нет</p>
+            {% endif %}
+            <p>Добавлено в: {{ task.created_at.strftime("%H:%M %d.%m.%Y") }}</p>
+            <hr>
+        {% else %}
+            <li>No tasks found</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

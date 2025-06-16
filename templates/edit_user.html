@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Редактировать профиль</title>
+</head>
+<body>
+    <h2>Редактировать задачу</h2>
+    <form method="post" action="/user/editing/{{ user.id }}">
+        <label for="username">Имя:</label>
+        <input type="text" name="username" value="{{ user.username }}" required><br><br>
+
+        <label for="email">Email:</label>
+        <textarea name="email" required>{{ user.email }}</textarea><br><br>
+
+        <label for="password">Пароль:</label>
+        <textarea name="password" required>{{ user.hashed_password }}</textarea><br><br>
+
+        <button type="submit">Сохранить изменения</button>
+    </form>
+</body>
+</html>

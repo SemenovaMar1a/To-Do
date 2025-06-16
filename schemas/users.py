@@ -18,10 +18,9 @@ class UserPublic(UserBase):
 class UserCreate(UserBase):
     """Модель для создания данных пользователя"""
     password: str = Field(...)
-    role: Role
 
 class UserUpdate(UserBase):
     """Модель для обновления данных пользователя"""
     username: str | None = None
     email: str | None = None
-    hashed_password: str | None = None
+    password: str | None = None

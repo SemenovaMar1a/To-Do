@@ -1,22 +1,41 @@
 <!DOCTYPE html>
 <html>
-<head><title>My Tasks</title></head>
+<head>
+    <title>My Tasks</title>
+</head>
 <body>
     <h2>{{ user.username }}'s Tasks</h2>
-    <ul>
+
+    {% if tasks %}
+        <ul>
         {% for task in tasks %}
-            <h4>{{ task.title }}</h4>
-            <p>Описание: {{ task.description }}</p>
-            {% if task.is_completed == true %}
-                <p>Завершено: Да</p>
-            {% else %}
-                <p>Завершено: Нет</p>
-            {% endif %}
-            <p>Добавлено в: {{ task.created_at.strftime("%H:%M %d.%m.%Y") }}</p>
-            <hr>
-        {% else %}
-            <li>No tasks found</li>
+            <li>
+                <h4>{{ task.title }}</h4>
+                <p>Описание: {{ task.description }}</p>
+                <p>Завершено: {{ "Да" if task.is_completed else "Нет" }}</p>
+                <p>Добавлено в: {{ task.created_at.strftime("%H:%M %d.%m.%Y") }}</p>
+
+                <!-- Кнопка "Выполнено" -->
+                {% if not task.is_completed %}
+                <form method="post" action="/task/complete/{{ task.id }}">
+                    <button type="submit">Выполнено</button>
+                </form>
+                {% endif %}
+
+                <!-- Кнопка "Удалить" -->
+                <form method="post" action="/task/delete/{{ task.id }}" onsubmit="return confirm('Удалить задачу?');">
+                    <button type="submit">Удалить</button>
+                </form>
+                <!-- Кнопка "Редактировать" -->
+                <form method="get" action="/task/editing/{{ task.id }}">
+                    <button type="submit">Редактировать</button>
+                </form>
+                <hr>
+            </li>
         {% endfor %}
-    </ul>
+        </ul>
+    {% else %}
+        <p>No tasks found</p>
+    {% endif %}
 </body>
 </html>

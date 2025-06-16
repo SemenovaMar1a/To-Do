@@ -9,5 +9,13 @@
     {% else %}
         <p>Role: Пользователь</p>
     {% endif %}
+    <!-- Кнопка "Редактировать" -->
+    <form method="get" action="/user/editing/{{ user.id }}">
+        <button type="submit">Редактировать</button>
+    </form>
+    <!-- Кнопка "Удалить" -->
+    <form method="post" action="/user/delete/{{ user.id }}"" onsubmit="return confirm('Удалить профиль?');">
+        <button type="submit">Удалить профиль</button>
+    </form>
 </body>
 </html>

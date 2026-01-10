@@ -4,7 +4,7 @@
     <title>Редактировать профиль</title>
 </head>
 <body>
-    <h2>Редактировать задачу</h2>
+    <h2>Редактировать профиль</h2>
     <form method="post" action="/user/editing/{{ user.id }}">
         <label for="username">Имя:</label>
         <input type="text" name="username" value="{{ user.username }}" required><br><br>
@@ -17,5 +17,7 @@
 
         <button type="submit">Сохранить изменения</button>
     </form>
+
+
 </body>
 </html>

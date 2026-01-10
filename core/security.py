@@ -14,7 +14,7 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
-    """Создает JWT-токен с payload `data` и временем жизни `expires_delta` (по умолчанию 15 минут)"""
+    """Формирует JWT-токен: копирует `data`, добавляет claim `exp` и кодирует результат"""
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta

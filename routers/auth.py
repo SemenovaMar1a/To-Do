@@ -41,7 +41,7 @@ async def login_for_access_token(session: SessionDep,
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Неверное имя пользователя или пароль",
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -76,5 +76,10 @@ async def login_form(
     )
     #Сохраняем токен в куку
     response = RedirectResponse("/user/me-page", status_code=302)
-    response.set_cookie(key="access_token", value=f"Bearer {access_token}", httponly=True)
+    response.set_cookie(
+        key="access_token", 
+        value=f"Bearer {access_token}", 
+        httponly=True,
+        samesite="lax",
+        secure=True)
     return response

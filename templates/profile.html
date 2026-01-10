@@ -1,21 +1,60 @@
 <!DOCTYPE html>
 <html>
-<head><title>My Profile</title></head>
+<head><title>Мой профиль</title></head>
 <body>
-    <h1>Hello, {{ user.username }}</h1>
+    <h1>Привет, {{ user.username }}</h1>
     <p>Email: {{ user.email }}</p>
     {% if user.role == "admin" %}
-        <p>Role: Администратор</p>
+        <p>Роль: Администратор</p>
     {% else %}
-        <p>Role: Пользователь</p>
+        <p>Роль: Пользователь</p>
     {% endif %}
     <!-- Кнопка "Редактировать" -->
     <form method="get" action="/user/editing/{{ user.id }}">
         <button type="submit">Редактировать</button>
     </form>
     <!-- Кнопка "Удалить" -->
-    <form method="post" action="/user/delete/{{ user.id }}"" onsubmit="return confirm('Удалить профиль?');">
+    <form method="post" action="/user/delete/{{ user.id }}" onsubmit="return confirm('Удалить профиль?');">
         <button type="submit">Удалить профиль</button>
     </form>
+    <!-- Кнопка "Добавить задачу" -->
+    <form method="get" action="/task/create_form/">
+        <button type="submit">Добавить задачу</button>
+    </form>
+
+    {% if tasks %}
+        <ul>
+        {% for task in tasks %}
+            <li>
+                <h4>{{ task.title }}</h4>
+                <p>Описание: {{ task.description }}</p>
+                <p>Завершено: {{ "Да" if task.is_completed else "Нет" }}</p>
+                <p>Добавлено в: {{ task.created_at.strftime("%H:%M %d.%m.%Y") }}</p>
+
+                <!-- Кнопка "Выполнено" -->
+                {% if not task.is_completed %}
+                <form method="post" action="/task/complete/{{ task.id }}">
+                    <button type="submit">Выполнено</button>
+                </form>
+                {% endif %}
+
+                <!-- Кнопка "Удалить" -->
+                <form method="post" action="/task/delete/{{ task.id }}" onsubmit="return confirm('Удалить задачу?');">
+                    <button type="submit">Удалить</button>
+                </form>
+                <!-- Кнопка "Редактировать" -->
+                <form method="get" action="/task/editing/{{ task.id }}">
+                    <button type="submit">Редактировать</button>
+                </form>
+                <hr>
+            </li>
+            <br></br>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No tasks found</p>
+    {% endif %}
+
+
 </body>
 </html>

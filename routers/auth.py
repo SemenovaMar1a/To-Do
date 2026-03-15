@@ -74,7 +74,7 @@ async def login_form(
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    #Сохраняем токен в куку
+    #Сохраняем токен в куки
     response = RedirectResponse("/user/me-page", status_code=302)
     response.set_cookie(
         key="access_token", 

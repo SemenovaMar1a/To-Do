@@ -44,17 +44,15 @@ def edit_user_form(
     email: str = Form(...),
     password: str = Form(...)):
     """Редактирование пользователя с HTML-ответом"""
-    user_db = session.get(User, user_id)
-
-    if not user_db or (current_user.role != Role.ADMIN and user_db.id != current_user.id):
+    if not current_user or (current_user.role != Role.ADMIN and current_user.id != user_id):
         raise HTTPException(status_code=404, detail="Пользователь не найден или нет доступа")
     
-    user_db.username = username
-    user_db.email = email
-    if user_db.hashed_password == password:
-        user_db.hashed_password = password
+    current_user.username = username
+    current_user.email = email
+    if current_user.hashed_password == password:
+        current_user.hashed_password = password
     else:
-        user_db.hashed_password = get_password_hash(password)
+        current_user.hashed_password = get_password_hash(password)
 
     session.commit()
     return RedirectResponse(url="/login", status_code=303)
@@ -63,16 +61,14 @@ def edit_user_form(
 def edit_user_form(
     request: Request,
     user_id: int, 
-    session: SessionDep, 
     current_user: User = Depends(get_current_user)):
     """Получение страницы для редактирования пользователя с HTML-ответом"""
-    user = session.get(User, user_id)
-    if not user or (current_user.role != Role.ADMIN and user.id != current_user.id):
+    if not current_user or (current_user.role != Role.ADMIN and current_user.id != user_id):
         raise HTTPException(status_code=404, detail="Пользователь не найден или нет доступа")
 
     return templates.TemplateResponse("edit_user.html", {
         "request": request,
-        "user": user
+        "user": current_user
     })
 
 @router.post("/delete/{user_id}")
@@ -81,11 +77,10 @@ def delete_user(
     session: SessionDep,
     current_user: User = Depends(get_current_user)):
     """Удаление профиля по ID с HTML-ответом"""
-    user = session.get(User, user_id)
-    if not user or (current_user.role != Role.ADMIN and user.id != current_user.id):
+    if not current_user or (current_user.role != Role.ADMIN and current_user.id != user_id):
         raise HTTPException(status_code=404, detail="Профиль не найден или нет доступа")
 
-    session.delete(user)
+    session.delete(current_user)
     session.commit()
     return RedirectResponse(url="/login", status_code=303)
 

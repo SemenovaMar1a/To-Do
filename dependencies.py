@@ -14,7 +14,10 @@ from services.user import get_user
 
 oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="token")
 
-async def get_current_user(session: SessionDep, token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_current_user(
+        session: SessionDep, 
+        token: Annotated[str, Depends(oauth2_scheme)]
+        ):
     """Получение авторизованного пользователя"""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -24,10 +27,10 @@ async def get_current_user(session: SessionDep, token: Annotated[str, Depends(oa
     
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username = payload.get("sub")
-        if username is None:
+        subject = payload.get("sub")
+        if subject is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
+        token_data = TokenData(username=subject)
     except InvalidTokenError:
         raise credentials_exception
     user = get_user(session, username=token_data.username)

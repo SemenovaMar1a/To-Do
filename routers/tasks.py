@@ -55,7 +55,10 @@ def delete_task(
     return RedirectResponse(url="/user/me-page", status_code=303)
 
 @router.post("/complete/{task_id}", name="complete_task")
-def complete_task(task_id: int, session: SessionDep, current_user: User = Depends(get_current_user)):
+def complete_task(
+    task_id: int, 
+    session: SessionDep, 
+    current_user: User = Depends(get_current_user)):
     """Выполнение задачи по ID с HTML-ответом"""
     task = session.get(Task, task_id)
     if not task or (current_user.role != Role.ADMIN and task.user_id != current_user.id):
@@ -64,7 +67,6 @@ def complete_task(task_id: int, session: SessionDep, current_user: User = Depend
     task.is_completed = True
     session.commit()
     return RedirectResponse(url="/user/me-page", status_code=303)
-
 
 @router.post("/editing/{task_id}")
 def update_task(

@@ -2,8 +2,11 @@ from fastapi.testclient import TestClient
 import pytest
 from sqlalchemy.pool import StaticPool
 from sqlmodel import SQLModel, create_engine, Session
+from core.security import get_password_hash
 from database import get_session
 from main import app
+from models.users import User
+from schemas.users import Role
 
 TEST_DATABASE_URL = "sqlite://"
 
@@ -39,4 +42,18 @@ def client(session):
         yield c
 
     app.dependency_overrides.clear()
+
+@pytest.fixture
+def test_user(session):
+    user = User(
+        username="TestName",
+        email="test@example.com",
+        hashed_password=get_password_hash("testpassword"),
+        role = Role.USER,
+    )
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    yield user
 

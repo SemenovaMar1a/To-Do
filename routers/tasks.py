@@ -90,7 +90,7 @@ def update_task(
     return RedirectResponse(url="/user/me-page", status_code=303)
 
 @router.get("/editing/{task_id}")
-def edit_task_form(
+def update_task_form(
     request: Request,
     task_id: int, 
     session: SessionDep, 

@@ -158,8 +158,8 @@ def test_edit_user_form_post_integration(client, test_user, session):
     assert response.status_code == 303
     assert response.headers["location"] == "/login"
     
-    updated_user = session.get(User, test_user.id)
-    assert updated_user.username == "Alice"
+    session.refresh(test_user)
+    assert test_user.username == "Alice"
 
 def test_edit_user_form_get(client):
     fake_user = MagicMock()

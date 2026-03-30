@@ -242,5 +242,86 @@ def test_complete_task_integration(client, test_task, test_user, session):
     task = session.get(Task, test_task.id)
     assert task.is_completed is True
 
+
+def test_update_task_post(client):
+    test_task = MagicMock()
+    test_task.id = 1
+    test_task.user_id = 1
+    test_task.title = "OldTitle"
+    test_task.description = "OldDescription"
+
+    test_user = MagicMock()
+    test_user.id = 1
+    test_user.role = Role.USER
+
+    fake_session = MagicMock()
+    fake_session.get.return_value = test_task
+
+    app.dependency_overrides[get_current_user] = lambda: test_user
+    app.dependency_overrides[get_session] = lambda: fake_session
+
+    form_data = {
+        "title": "TestTitle",
+        "description": "TestDescription",
+    }
+
+    response = client.post(f"/task/editing/{test_task.id}", data=form_data, follow_redirects=False)
+
+    assert response.status_code == 303
+    assert response.headers["location"] == "/user/me-page"
+    assert test_task.title == "TestTitle"
+    assert test_task.description == "TestDescription"
+
+    fake_session.get.assert_called_once()
+    fake_session.commit.assert_called_once()
+
+    app.dependency_overrides.clear()
+
+def test_update_task_post_integration(client, test_task, test_user, session):
+    token = create_access_token({"sub": str(test_user.username)})
+
+    form_data = {
+        "title": "NewTitle",
+        "description": "NewDescription",
+    }
     
+    response = client.post(f"/task/editing/{test_task.id}", headers={"Authorization": f"Bearer {token}"}, data=form_data, follow_redirects=False)
+
+    assert response.status_code == 303
+    assert response.headers["location"] == "/user/me-page"
+
+    session.refresh(test_task)
+
+    assert test_task.title == "NewTitle"
+    assert test_task.description == "NewDescription"
+
+def test_update_task_form_get(client):
+    test_task = MagicMock()
+    test_task.id = 1
+    test_task.user_id = 1
+
+    test_user = MagicMock()
+    test_user.id = 1
+    test_user.role = Role.USER
+
+    fake_session = MagicMock()
+    fake_session.get.return_value = test_task
+
+    app.dependency_overrides[get_current_user] = lambda: test_user
+    app.dependency_overrides[get_session] = lambda: fake_session
+
+    response = client.get(f"/task/editing/{test_task.id}")
+
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
+
+    app.dependency_overrides.clear()
+
+def test_update_task_form_get_integration(client, test_task, test_user):
+    token = create_access_token({"sub": str(test_user.username)})
+
+    response = client.get(f"/task/editing/{test_task.id}", headers={"Authorization": f"Bearer {token}"})
+
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
 

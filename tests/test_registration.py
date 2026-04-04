@@ -1,8 +1,10 @@
 from unittest.mock import MagicMock
 
-from core.security import get_password_hash
+from sqlmodel import select
+
 from database import get_session
-from tests.conftest import client
+from models.users import User
+from tests.conftest import client, session
 from main import app
 
 
@@ -35,5 +37,23 @@ def test_create_user_form_post(client):
     assert response.headers["location"] == "/login"
 
     app.dependency_overrides.clear()
+
+def test_create_user_form_post_integration(client, session):
+    data_form = {
+        "username": "TestName",
+        "email": "test@example.com",
+        "password": "testpassword",
+    }
+
+    response = client.post("/registration", data=data_form, follow_redirects=False)
+
+    new_user = session.exec(select(User).where(User.username == "TestName")).first()
+
+    assert response.status_code == 302
+    assert response.headers["location"] == "/login"
+
+    assert new_user is not None
+
+
 
 

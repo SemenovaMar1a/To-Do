@@ -13,18 +13,20 @@ from services.user import authenticate_user
 
 templates = Jinja2Templates(directory="templates")
 
-
 router = APIRouter()
 
 class OAuth2PasswordBearerWithCookie(OAuth2PasswordBearer):
     """Auth2 через пароль с куки"""
     async def __call__(self, request: Request) -> str:
         """Получить токен из заголовка или куки"""
+
         auth_header = request.headers.get("Authorization")
+
         if auth_header:
             return await super().__call__(request)
 
         token = request.cookies.get("access_token")
+        
         if token:
             if token.startswith("Bearer "):
                 token = token[len("Bearer "):]
@@ -33,7 +35,8 @@ class OAuth2PasswordBearerWithCookie(OAuth2PasswordBearer):
         return await super().__call__(request)
 
 @router.post("/token")
-async def login_for_access_token(session: SessionDep,
+async def login_for_access_token(
+    session: SessionDep,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
     """Поток паролей OAuth2 для генерации токенов"""
@@ -78,7 +81,7 @@ async def login_form(
     response = RedirectResponse("/user/me-page", status_code=302)
     response.set_cookie(
         key="access_token", 
-        value=f"Bearer {access_token}", 
+        value=access_token, 
         httponly=True,
         samesite="lax",
         secure=True)

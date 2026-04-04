@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 from core.security import create_access_token, get_password_hash
 from database import get_session
 from dependencies import get_current_user
-from conftest import session, client, test_user
+from conftest import session, client, user
 from models.users import User
 from main import app
 from schemas.users import Role
@@ -39,8 +39,8 @@ def test_user_me_page_get_tasks(client):
 
     app.dependency_overrides.clear()
 
-def test_user_me_page_get_integration(test_user, client):
-    token = create_access_token({"sub": str(test_user.username)})
+def test_user_me_page_get_integration(user, client):
+    token = create_access_token({"sub": str(user.username)})
 
     response = client.get("/user/me-page", headers={"Authorization": f"Bearer {token}"})
     
@@ -144,8 +144,8 @@ def test_edit_user_form_post_access_admin(client):
 
     app.dependency_overrides.clear()
 
-def test_edit_user_form_post_integration(client, test_user, session):
-    token = create_access_token({"sub": str(test_user.username)})
+def test_edit_user_form_post_integration(client, user, session):
+    token = create_access_token({"sub": str(user.username)})
 
     form_data ={
         "username": "Alice",
@@ -153,13 +153,13 @@ def test_edit_user_form_post_integration(client, test_user, session):
         "password": get_password_hash("testpassword"),
     }
 
-    response = client.post(f"/user/editing/{test_user.id}", headers={"Authorization": f"Bearer {token}"}, data=form_data, follow_redirects=False)
+    response = client.post(f"/user/editing/{user.id}", headers={"Authorization": f"Bearer {token}"}, data=form_data, follow_redirects=False)
 
     assert response.status_code == 303
     assert response.headers["location"] == "/login"
     
-    session.refresh(test_user)
-    assert test_user.username == "Alice"
+    session.refresh(user)
+    assert user.username == "Alice"
 
 def test_edit_user_form_get(client):
     fake_user = MagicMock()
@@ -171,10 +171,10 @@ def test_edit_user_form_get(client):
     assert response.status_code == 200
     assert "text/html" in response.headers["content-type"]
 
-def test_edit_user_form_get_integration(client, test_user):
-    token = create_access_token({"sub": str(test_user.username)})
+def test_edit_user_form_get_integration(client, user):
+    token = create_access_token({"sub": str(user.username)})
 
-    response = client.get(f"/user/editing/{test_user.id}", headers={"Authorization": f"Bearer {token}"})
+    response = client.get(f"/user/editing/{user.id}", headers={"Authorization": f"Bearer {token}"})
 
     assert response.status_code == 200
     assert "text/html" in response.headers["content-type"]
@@ -197,15 +197,15 @@ def test_delete_user_post(client):
     fake_session.delete.assert_called_once_with(fake_user)
     fake_session.commit.assert_called_once()
 
-def test_delete_user_post_integration(client, test_user, session):
-    token = create_access_token({"sub": str(test_user.username)})
+def test_delete_user_post_integration(client, user, session):
+    token = create_access_token({"sub": str(user.username)})
 
-    response = client.post(f"/user/delete/{test_user.id}", headers={"Authorization": f"Bearer {token}"}, follow_redirects=False)
+    response = client.post(f"/user/delete/{user.id}", headers={"Authorization": f"Bearer {token}"}, follow_redirects=False)
 
     assert response.status_code == 303
     assert response.headers["location"] == "/login"
 
-    delete_user = session.get(User, test_user.id)
+    delete_user = session.get(User, user.id)
     assert delete_user is None
 
 

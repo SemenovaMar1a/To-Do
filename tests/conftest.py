@@ -12,19 +12,21 @@ TEST_DATABASE_URL = "sqlite://"
 
 test_engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False}, poolclass=StaticPool,)
 
-@pytest.fixture(scope="session", autouse=True)
-def create_test_db():
-    SQLModel.metadata.drop_all(test_engine)
-    SQLModel.metadata.create_all(test_engine)
+@pytest.fixture()
+def create_test_db(session):
+    SQLModel.metadata.create_all(session.get_bind())
+    yield
+    SQLModel.metadata.drop_all(session.get_bind())
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def session():
     connection = test_engine.connect()
     transaction = connection.begin()
 
-    session = Session(bind=connection)
+    SQLModel.metadata.create_all(connection)  # создаём таблицы на этом соединении
 
+    session = Session(bind=connection)
     yield session
 
     session.close()
@@ -35,7 +37,7 @@ def session():
 def client(session):
     def override_get_session():
         yield session
-    
+
     app.dependency_overrides[get_session] = override_get_session
 
     with TestClient(app) as c:

@@ -6,17 +6,17 @@ from database import get_session
 from dependencies import get_current_user
 from models.tasks import Task
 from schemas.users import Role
-from tests.conftest import client, test_user
+from tests.conftest import client, user
 from main import app
 from models.tasks import Task
 
 
 @pytest.fixture
-def test_task(session, test_user):
+def test_task(session, user):
     task = Task(
         title="TestTitle",
         description="TestDescription",
-        user_id=test_user.id,
+        user_id=user.id,
     )
     session.add(task)
     session.commit()
@@ -36,8 +36,8 @@ def test_create_task_form_get(client):
 
     app.dependency_overrides.clear()
 
-def test_create_task_form_get_integration(client, test_user):
-    token = create_access_token({"sub": str(test_user.username)})
+def test_create_task_form_get_integration(client, user):
+    token = create_access_token({"sub": str(user.username)})
 
     response = client.get("/task/create_form", headers={"Authorization": f"Bearer {token}"})
 
@@ -74,8 +74,8 @@ def test_create_task_form_post(client):
 
     app.dependency_overrides.clear()
 
-def test_create_task_form_post_integration(client, test_task, test_user, session):
-    token = create_access_token({"sub": str(test_user.username)})
+def test_create_task_form_post_integration(client, test_task, user, session):
+    token = create_access_token({"sub": str(user.username)})
 
     form_data = {
         "title": "TestTitle",
@@ -90,7 +90,7 @@ def test_create_task_form_post_integration(client, test_task, test_user, session
     new_task = session.exec(select(Task).where(Task.title == "TestTitle")).first()
 
     assert new_task is not None
-    assert new_task.user_id == test_user.id
+    assert new_task.user_id == user.id
 
 def test_delete_task_post(client):
     test_task = MagicMock()
@@ -118,8 +118,8 @@ def test_delete_task_post(client):
 
     app.dependency_overrides.clear()
 
-def test_delete_task_post_integration(client, test_user, session, test_task):
-    token = create_access_token({"sub": str(test_user.username)})
+def test_delete_task_post_integration(client, user, session, test_task):
+    token = create_access_token({"sub": str(user.username)})
 
     response = client.post(f"/task/delete/{test_task.id}", headers={"Authorization": f"Bearer {token}"}, follow_redirects=False)
 
@@ -231,8 +231,8 @@ def test_complete_task(client):
 
     app.dependency_overrides.clear()
 
-def test_complete_task_integration(client, test_task, test_user, session):
-    token = create_access_token({"sub": str(test_user.username)})
+def test_complete_task_integration(client, test_task, user, session):
+    token = create_access_token({"sub": str(user.username)})
 
     response = client.post(f"/task/complete/{test_task.id}",headers={"Authorization": f"Bearer {token}"}, follow_redirects=False)
 
@@ -277,8 +277,8 @@ def test_update_task_post(client):
 
     app.dependency_overrides.clear()
 
-def test_update_task_post_integration(client, test_task, test_user, session):
-    token = create_access_token({"sub": str(test_user.username)})
+def test_update_task_post_integration(client, test_task, user, session):
+    token = create_access_token({"sub": str(user.username)})
 
     form_data = {
         "title": "NewTitle",
@@ -317,8 +317,8 @@ def test_update_task_form_get(client):
 
     app.dependency_overrides.clear()
 
-def test_update_task_form_get_integration(client, test_task, test_user):
-    token = create_access_token({"sub": str(test_user.username)})
+def test_update_task_form_get_integration(client, test_task, user):
+    token = create_access_token({"sub": str(user.username)})
 
     response = client.get(f"/task/editing/{test_task.id}", headers={"Authorization": f"Bearer {token}"})
 

@@ -9,5 +9,3 @@ venv/
 
 .idea/
 .vscode/
-
-echo "dependencies.py"

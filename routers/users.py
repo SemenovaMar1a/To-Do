@@ -1,15 +1,15 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, Form, Query, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlmodel import select
 from passlib.context import CryptContext
+from core.exceptions import user_verification_error
 from core.security import get_password_hash
 from database import SessionDep
 from dependencies import get_current_user
 from models.tasks import Task
 from models.users import User
-from schemas.users import Role
 
 
 router = APIRouter(prefix="/user", tags=["users"])
@@ -44,8 +44,7 @@ def edit_user_form(
     email: str = Form(...),
     password: str = Form(...)):
     """Редактирование пользователя с HTML-ответом"""
-    if not current_user or (current_user.role != Role.ADMIN and current_user.id != user_id):
-        raise HTTPException(status_code=404, detail="Пользователь не найден или нет доступа")
+    user_verification_error(current_user, user_id)
     
     current_user.username = username
     current_user.email = email
@@ -63,8 +62,7 @@ def edit_user_form(
     user_id: int, 
     current_user: User = Depends(get_current_user)):
     """Получение страницы для редактирования пользователя с HTML-ответом"""
-    if not current_user or (current_user.role != Role.ADMIN and current_user.id != user_id):
-        raise HTTPException(status_code=404, detail="Пользователь не найден или нет доступа")
+    user_verification_error(current_user, user_id)
 
     return templates.TemplateResponse("edit_user.html", {
         "request": request,
@@ -77,8 +75,7 @@ def delete_user(
     session: SessionDep,
     current_user: User = Depends(get_current_user)):
     """Удаление профиля по ID с HTML-ответом"""
-    if not current_user or (current_user.role != Role.ADMIN and current_user.id != user_id):
-        raise HTTPException(status_code=404, detail="Профиль не найден или нет доступа")
+    user_verification_error(current_user, user_id)
 
     session.delete(current_user)
     session.commit()

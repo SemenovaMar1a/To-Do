@@ -20,8 +20,8 @@ def test_login_for_access_token_post(client):
 
         assert response.status_code == 200
 
-def test_login_for_access_token_integration(client, user):
-    response = client.post("/token", data={"username": user.username, "password": "testpassword", "grant_type": "password"},)
+def test_login_for_access_token_integration(client, test_user):
+    response = client.post("/token", data={"username": test_user.username, "password": "testpassword", "grant_type": "password"},)
     
     assert response.status_code == 200
     data = response.json()
@@ -91,8 +91,8 @@ def test_login_form(client):
         assert response.headers["location"] == "/user/me-page"
         mock_auth.assert_called_once_with(fake_session, "TestName", "TestPassword")
 
-def test_login_form_integration(client, user):
-    response = client.post("/login", data={"username": user.username, "password": "testpassword"}, follow_redirects=False)
+def test_login_form_integration(client, test_user):
+    response = client.post("/login", data={"username": test_user.username, "password": "testpassword"}, follow_redirects=False)
 
     assert response.status_code == 302
     assert response.headers["location"] == "/user/me-page"

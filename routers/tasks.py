@@ -1,13 +1,12 @@
 from typing import Optional
-from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
+from core.exceptions import task_verification_error
 from database import SessionDep
 from dependencies import get_current_user
 from models.tasks import Task
 from models.users import User
-from schemas.tasks import TaskCreate, TaskPublic, TaskUpdate
-from schemas.users import Role
 
 
 router = APIRouter(prefix="/task", tags=["tasks"])
@@ -47,8 +46,8 @@ def delete_task(
     current_user: User = Depends(get_current_user)):
     """Удаление задачи по ID с HTML-ответом"""
     task = session.get(Task, task_id)
-    if not task or (current_user.role != Role.ADMIN and task.user_id != current_user.id):
-        raise HTTPException(status_code=404, detail="Задача не найдена или нет доступа")
+
+    task_verification_error(task, current_user)
 
     session.delete(task)
     session.commit()
@@ -61,8 +60,8 @@ def complete_task(
     current_user: User = Depends(get_current_user)):
     """Выполнение задачи по ID с HTML-ответом"""
     task = session.get(Task, task_id)
-    if not task or (current_user.role != Role.ADMIN and task.user_id != current_user.id):
-        raise HTTPException(status_code=404, detail="Задача не найдена или нет доступа")
+    
+    task_verification_error(task, current_user)
 
     task.is_completed = True
     session.commit()
@@ -77,14 +76,13 @@ def update_task(
     description: str = Form(...),
     is_completed: Optional[str] = Form(None)):
     """Обновление задачи с HTML-ответом"""
-    task_db = session.get(Task, task_id)
+    task = session.get(Task, task_id)
 
-    if not task_db or (current_user.role != Role.ADMIN and task_db.user_id != current_user.id):
-        raise HTTPException(status_code=404, detail="Задача не найдена или нет доступа")
+    task_verification_error(task, current_user)
     
-    task_db.title = title
-    task_db.description = description
-    task_db.is_completed = is_completed == "true"
+    task.title = title
+    task.description = description
+    task.is_completed = is_completed == "true"
 
     session.commit()
     return RedirectResponse(url="/user/me-page", status_code=303)
@@ -97,8 +95,8 @@ def update_task_form(
     current_user: User = Depends(get_current_user)):
     """Обновление задачи с HTML-ответом"""
     task = session.get(Task, task_id)
-    if not task or (current_user.role != Role.ADMIN and task.user_id != current_user.id):
-        raise HTTPException(status_code=404, detail="Задача не найдена или нет доступа")
+
+    task_verification_error(task, current_user)
 
     return templates.TemplateResponse("edit_task.html", {
         "request": request,

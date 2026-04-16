@@ -2,7 +2,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from database import get_session
 from dependencies import get_current_user
 from main import app
 

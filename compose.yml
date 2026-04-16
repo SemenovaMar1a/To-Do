@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: psgr
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - dbnet
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    ports:
+      - "127.0.0.1:8080:8080"
+    links:
+      - "postgres:db"
+    networks:
+      - dbnet
+    depends_on:
+      - postgres
+
+  todosite:
+    build: .
+    image: todosite
+    container_name: todosite
+    restart: always
+    command: gunicorn -k uvicorn.workers.UvicornWorker main:app -b 0.0.0.0:8000
+    networks:
+      - dbnet
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-server
+    restart: always
+    networks:
+      - dbnet
+    expose:
+      - 8088
+    ports:
+      - "80:8088"
+    volumes:
+      - ./logs:/app/www/TO-DO/logs
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - todosite
+
+
+
+networks:
+  dbnet:
+    driver: bridge
+
+volumes:
+  postgres-data:

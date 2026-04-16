@@ -1,4 +1,3 @@
-from sqlalchemy import func
 from sqlmodel import select
 from core.security import verify_password
 from database import SessionDep

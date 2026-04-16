@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta, timezone
+import os
 import jwt
-from core.config import ALGORITHM, SECRET_KEY
 from core.security import create_access_token
 
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
 
 def test_create_access_token():
     data = {"sub": "testuser"}

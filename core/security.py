@@ -1,9 +1,11 @@
 from datetime import datetime, timedelta, timezone
+import os
 import jwt
 from passlib.context import CryptContext
-from core.config import SECRET_KEY, ALGORITHM
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
 
 def verify_password(plain_password, hashed_password):
     """Проверяет, совпадает ли введённый пароль с его хэшированной версией """

@@ -3,7 +3,7 @@ import pytest
 from database import get_session
 from main import app
 from starlette.requests import Request
-from starlette.datastructures import Headers, MutableHeaders
+from starlette.datastructures import Headers
 from unittest.mock import AsyncMock
 
 from routers.auth import OAuth2PasswordBearerWithCookie

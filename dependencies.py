@@ -1,9 +1,9 @@
 from asyncio import Task
+import os
 from typing import Annotated
 from fastapi import Depends, HTTPException, status
 import jwt
 from jwt import InvalidTokenError
-from core.config import ALGORITHM, SECRET_KEY
 from database import SessionDep
 from models.users import User
 from routers.auth import OAuth2PasswordBearerWithCookie
@@ -13,6 +13,9 @@ from services.user import get_user
 
 
 oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="token")
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
 
 async def get_current_user(
         session: SessionDep, 

@@ -4,7 +4,6 @@ from sqlmodel import select
 
 from database import get_session
 from models.users import User
-from tests.conftest import client, session
 from main import app
 
 

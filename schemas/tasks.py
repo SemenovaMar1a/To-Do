@@ -22,4 +22,3 @@ class TaskUpdate(TaskBase):
     title: str | None = None
     description: str | None = None
     is_completed: bool | None = None
-    created_at: datetime | None = None

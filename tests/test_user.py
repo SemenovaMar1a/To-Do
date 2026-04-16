@@ -1,8 +1,7 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 from core.security import create_access_token, get_password_hash
 from database import get_session
 from dependencies import get_current_user
-from conftest import session, client, test_user
 from models.users import User
 from main import app
 from schemas.users import Role
